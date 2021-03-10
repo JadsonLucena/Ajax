@@ -7,6 +7,7 @@ function Ajax(url, {
     password = null,
     responseType = 'text',
     user = null,
+    withCredentials = false,
     aborted = e => console.log('aborted', e),
     end = e => console.log('end', e),
     error = e => console.log('error', e),
@@ -30,6 +31,8 @@ function Ajax(url, {
     xhr.overrideMimeType(mimeType);
 
     xhr.responseType = responseType;
+
+    xhr.withCredentials = withCredentials;
 
     xhr.onloadend = e => end(e.timeStamp);
 
