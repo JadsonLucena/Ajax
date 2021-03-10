@@ -6,6 +6,7 @@ function Ajax(url, {
     mimeType = 'text/plain',
     password = null,
     responseType = 'text',
+    timeout = 0,
     user = null,
     withCredentials = false,
     aborted = e => console.log('aborted', e),
@@ -14,6 +15,7 @@ function Ajax(url, {
     readystate = e => console.log('readystate', e),
     start = e => console.log('start', e),
     success = e => console.log('success', e),
+    timeouted = e => console.log('timeouted', e),
     XHR = e => console.log('XHR', e)
 } = {}) {
 
@@ -31,6 +33,8 @@ function Ajax(url, {
     xhr.overrideMimeType(mimeType);
 
     xhr.responseType = responseType;
+
+    xhr.timeout = timeout;
 
     xhr.withCredentials = withCredentials;
 
@@ -50,6 +54,7 @@ function Ajax(url, {
     xhr.onabort = e => { aborted(e.timeStamp); };
     xhr.onerror = e => { error(_error(e)); };
     xhr.onload = e => { success(_success(e)); };
+    xhr.ontimeout = e => { timeouted(e.timeStamp); };
 
     XHR({ abort: () => xhr.abort(), XHR: xhr });
 
