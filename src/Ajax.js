@@ -12,6 +12,7 @@ function Ajax(url, {
     aborted = e => console.log('aborted', e),
     end = e => console.log('end', e),
     error = e => console.log('error', e),
+    progress = e => console.log('progress', e),
     readystate = e => console.log('readystate', e),
     start = e => console.log('start', e),
     success = e => console.log('success', e),
@@ -38,9 +39,13 @@ function Ajax(url, {
 
     xhr.withCredentials = withCredentials;
 
-    xhr.onloadend = e => end(e.timeStamp);
+    let scope = (/^(GET|HEAD)$/i.test(method.trim()) ? xhr : xhr.upload);
 
-    xhr.onloadstart = e => start(e.timeStamp);
+    scope.onloadend = e => end(e.timeStamp);
+
+    scope.onloadstart = e => start(e.timeStamp);
+
+    scope.onprogress = e => progress({ lengthComputable: e.lengthComputable, loaded: e.loaded, total: e.total, timeStamp: e.timeStamp });
 
     let _state = e => ({ readyState: xhr.readyState, status: xhr.status, statusText: xhr.statusText, timeStamp: e.timeStamp });
 
@@ -51,10 +56,10 @@ function Ajax(url, {
     let _success = e => ({ ..._state(e), getAllResponseHeaders: () => xhr.getAllResponseHeaders(), getResponseHeader: (header) => xhr.getResponseHeader(header), response: xhr.response, XHR: xhr }),
         _error = e =>   ({ ..._state(e), type: e.type, XHR: xhr });
 
-    xhr.onabort = e => { aborted(e.timeStamp); };
-    xhr.onerror = e => { error(_error(e)); };
-    xhr.onload = e => { success(_success(e)); };
-    xhr.ontimeout = e => { timeouted(e.timeStamp); };
+    scope.onabort = e => { aborted(e.timeStamp); };
+    scope.onerror = e => { error(_error(e)); };
+    scope.onload = e => { success(_success(e)); };
+    scope.ontimeout = e => { timeouted(e.timeStamp); };
 
     XHR({ abort: () => xhr.abort(), XHR: xhr });
 
