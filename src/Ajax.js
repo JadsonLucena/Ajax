@@ -1,6 +1,7 @@
 function Ajax(url, {
     async = true,
     body = null,
+    headers = {},
     method = 'GET',
     mimeType = 'text/plain',
     password = null,
@@ -18,6 +19,13 @@ function Ajax(url, {
     let xhr = new XMLHttpRequest();
 
     xhr.open(method, url, async, user, password);
+
+    headers = new Headers(headers);
+    for (let header of headers.keys()) {
+
+        xhr.setRequestHeader(header, headers.get(header));
+
+    }
 
     xhr.overrideMimeType(mimeType);
 
