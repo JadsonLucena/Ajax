@@ -53,14 +53,18 @@ function Ajax(url, {
 
     xhr.send(body);
 
-    let _success = e => ({ ..._state(e), getAllResponseHeaders: () => xhr.getAllResponseHeaders(), getResponseHeader: (header) => xhr.getResponseHeader(header), response: xhr.response, XHR: xhr }),
-        _error = e =>   ({ ..._state(e), type: e.type, XHR: xhr });
+    return new Promise((resolve, reject) => {
 
-    scope.onabort = e => { aborted(e.timeStamp); };
-    scope.onerror = e => { error(_error(e)); };
-    scope.onload = e => { success(_success(e)); };
-    scope.ontimeout = e => { timeouted(e.timeStamp); };
+        let _success = e => ({ ..._state(e), getAllResponseHeaders: () => xhr.getAllResponseHeaders(), getResponseHeader: (header) => xhr.getResponseHeader(header), response: xhr.response, XHR: xhr }),
+            _error = e =>   ({ ..._state(e), type: e.type, XHR: xhr });
 
-    XHR({ abort: () => xhr.abort(), XHR: xhr });
+        scope.onabort = e => { aborted(e.timeStamp); reject(_error(e)); };
+        scope.onerror = e => { error(_error(e)); reject(_error(e)); };
+        scope.onload = e => { success(_success(e)); resolve(_success(e)); };
+        scope.ontimeout = e => { timeouted(e.timeStamp); reject(_error(e)); };
+
+        XHR({ abort: () => xhr.abort(), XHR: xhr });
+
+    });
 
 };
