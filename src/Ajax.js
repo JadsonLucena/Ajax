@@ -2,7 +2,9 @@ function Ajax(url, {
     async = true,
     body = null,
     method = 'GET',
+    mimeType = 'text/plain',
     password = null,
+    responseType = 'text',
     user = null,
     aborted = e => console.log('aborted', e),
     end = e => console.log('end', e),
@@ -16,6 +18,10 @@ function Ajax(url, {
     let xhr = new XMLHttpRequest();
 
     xhr.open(method, url, async, user, password);
+
+    xhr.overrideMimeType(mimeType);
+
+    xhr.responseType = responseType;
 
     xhr.onloadend = e => end(e.timeStamp);
 
